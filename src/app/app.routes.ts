@@ -10,7 +10,7 @@ import { MainComponent } from './components/main/main.component';
 
 export const routeConfig: Routes = [
     // { path: '', redirectTo: 'home', pathMatch: 'full'},
-    { path: '', component: SigninComponent, title:'Home page'},
+    { path: '', component: MainComponent, title:'Home page'},
     { path: 'details/:id', component: DetailsComponent, title:'Home details'},
     { path: 'profile', component: ProfileComponent},
     { path: 'signup', component: SigninComponent},
