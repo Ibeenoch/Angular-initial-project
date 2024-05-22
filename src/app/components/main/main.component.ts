@@ -1,7 +1,8 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Inject, OnInit, PLATFORM_ID, Renderer2, ViewChild } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { Chart, registerables } from 'chart.js';
+import { RouterLink } from '@angular/router'
 import {
   heroBars3,
   heroXMark,
@@ -14,7 +15,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-main',
   standalone: true,
-  imports: [NgIconComponent, CommonModule],
+  imports: [NgIconComponent, CommonModule, RouterLink],
   providers: [provideIcons({ heroBars3, heroXMark, heroArrowRight, heroPlus, heroExclamationTriangle })],
   template: `
     <div class="flex justify-between items-center p-4 bg-[#fff9ed]">
@@ -28,26 +29,38 @@ Chart.register(...registerables);
         </button>
       </div>
 
-      <div class="hidden sm:flex sm:items-center">
+      <div class="hidden sm:flex sm:items-center cursor-pointer">
         <div
-          class="sm:text-xs sm:font-semibold sm:mx-2 text-black border-b-2 border-b-[#f3b44b]"
+        (click)="activateNavJobSeeker()"
+        [ngClass]="{'border-b-2':isJobSeekers, 'border-b-[#f3b44b]': isJobSeekers}"
+          class="sm:text-xs sm:font-semibold sm:mx-2 text-black"
         >
           Job Seekers
         </div>
-        <div class="sm:text-xs sm:font-semibold sm:mx-2 text-black">
+        <div
+        (click)="activateNavEmployer()"
+        [ngClass]="{'border-b-2': isEmployer, 'border-b-[#f3b44b]': isEmployer}"
+        class="sm:text-xs sm:font-semibold sm:mx-2 text-black cursor-pointer">
           Employers
         </div>
-        <div class="sm:text-xs sm:font-semibold sm:mx-2 text-black">Data</div>
+        <div        
+        (click)="activateNavData()"
+        [ngClass]="{'border-b-2': isData, 'border-b-[#f3b44b]': isData}"
+        class="sm:text-xs sm:font-semibold sm:mx-2 text-black cursor-pointer">Data</div>
       </div>
 
       <div class="hidden sm:flex sm:items-center">
         <button
-          class="sm:text-black sm:font-semibold sm:text-xs sm:px-4 sm:py-2 sm:rounded-xl"
+        (click)="activateLogin()"
+        [ngClass]="{'sm:bg-[#f3b44b]': isLogin, 'sm:bg-transparent': !isLogin, 'sm:text-white': isLogin, 'sm:text-black': !isLogin, 'sm:rounded-xl': isLogin,}"
+          class="sm:font-semibold sm:text-xs sm:px-2 sm:py-2 mx-3"
         >
           Log In
         </button>
         <button
-          class="sm:text-white sm:bg-[#f3b44b] sm:font-semibold sm:text-xs sm:px-4 sm:py-2 sm:rounded-xl"
+        (click)="activateSignin()"
+        [ngClass]="{'sm:bg-[#f3b44b]': isSignin, 'sm:bg-transparent': !isSignin, 'sm:text-white': isSignin, 'sm:text-black': !isSignin, 'sm:rounded-xl': isSignin, }"
+          class="sm:font-semibold sm:text-xs sm:px-2 sm:py-2 mx-3"
         >
           Sign Up
         </button>
@@ -64,26 +77,36 @@ Chart.register(...registerables);
         <div class="flex justify-between gap-6 px-2">
           <ul class="mr-6 pt-5">
             <li
-              class="text-black text-md font-semibold py-1 my-1 cursor-pointer border-b-2 border-b-[#f3b44b]"
+            (click)="activateNavJobSeeker()"
+            [ngClass]="{'border-b-2':isJobSeekers, 'border-b-[#f3b44b]': isJobSeekers}"         
+              class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
             >
               Job Seekers
             </li>
-            <li
+            <li            
+        (click)="activateNavEmployer()"
+        [ngClass]="{'border-b-2': isEmployer, 'border-b-[#f3b44b]': isEmployer}"
               class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
             >
               Employers
             </li>
             <li
+              (click)="activateNavData()"
+             [ngClass]="{'border-b-2': isData, 'border-b-[#f3b44b]': isData}"
               class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
             >
               Data
             </li>
             <li
-              class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
+            (click)="activateMobileLogin()"
+            [ngClass]="{'border-b-2': isMobileLogin, 'border-b-[#f3b44b]': isMobileLogin}"       
+            class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
             >
               Log In
             </li>
             <li
+            (click)="activateMobileSignin()"
+            [ngClass]="{'border-b-2': isMobileSignin, 'border-b-[#f3b44b]': isMobileSignin}"    
               class="text-black text-md font-semibold py-1 my-1 cursor-pointer"
             >
               Sign Up
@@ -195,14 +218,18 @@ Chart.register(...registerables);
           </p>
           <div class="flex items-center justify-center mt-6">
             <button
-              class="text-white px-4 py-2 text-xs sm:text-sm md:text-md font-semibold rounded-xl bg-[#e38a00]"
+            (click)="activateGetAccess()"
+            [ngClass]="{'bg-[#e38a00]': isGetAccess, 'rounded-xl': isGetAccess, 'text-white': isGetAccess}"   
+              class="text-black px-4 py-2 text-xs sm:text-sm md:text-md font-semibold"
             >
-              <a href="#">Get Access</a>
+              Get Access
             </button>
             <button
-              class="text-black text-xs sm:text-sm md:text-md font-semibold ml-5"
+            (click)="activateExploreData()"
+            [ngClass]="{'bg-[#e38a00]': isExploreData, 'rounded-xl': isExploreData,  'text-white': isExploreData}"   
+              class="text-black text-xs px-4 py-2 sm:text-sm md:text-md font-semibold ml-5"
             >
-              <a href="#">Explore Data</a>
+              Explore Data
             </button>
           </div>
         </div>
@@ -314,14 +341,20 @@ Chart.register(...registerables);
         <div
           class="bg-gray-200 flex justify-center items-center py-1 rounded-lg"
         >
-          <h1 class="text-black font-bold text-sm px-14 py-2">Dictionary</h1>
+          <h1 
+          (click)="toggleDictionary()"
+          [ngClass]="{ 'rounded-lg': isdictionary, 'bg-white': isdictionary }"
+          class="text-black font-bold text-sm px-14 py-2" >Dictionary</h1>
+
           <h1
-            class="text-black bg-white font-bold text-sm rounded-lg px-10 py-2"
+          (click)="toggleJson()"
+          [ngClass]="{ 'rounded-lg': isjson, 'bg-white': isjson }"
+            class="text-black font-bold text-sm  px-10 py-2"
           >
             JSON
           </h1>
         </div>
-        <div class="bg-gray-800 max-h-[200px] overflow-y-auto">
+        <div *ngIf="isjson" class="bg-gray-800 max-h-[200px] overflow-y-auto">
           <pre>
             <code>
               <span class="text-white text-sm">&#123;</span> 
@@ -345,6 +378,31 @@ Chart.register(...registerables);
           </code>
           </pre>
         </div>
+
+        <div  *ngIf="!isjson" class="bg-red-200 max-h-[200px] overflow-y-auto">
+          <pre>
+            <code>
+              <span class="text-black text-sm">&#123;</span> 
+              <span class="text-sky-700 text-xs">'name'<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">'John doe',</span> 
+              <span class="text-sky-700 text-xs">'phone'<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">1234567890,</span> 
+              <span class="text-sky-700 text-xs">'location'<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">'canada',</span> 
+              <span class="text-sky-700 text-xs">'hobby'<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs" > 'singing', </span> 
+              <span class="text-sky-700 text-xs">'email'<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">'johndoe&#64;email.com',</span> 
+              <span class="text-sky-700 text-xs">"scripts"<span class="text-red-500 text-xs">:</span></span> <span class="text-black text-sm">&#123;</span> 
+              <span class="text-sky-700 text-xs">"start"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"nodemon index.js",</span> 
+               <span class="text-black text-sm">&#125;</span> 
+              <span class="text-sky-700 text-xs">"keywords"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">[],</span> 
+              <span class="text-sky-700 text-xs">"author"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"John doe",</span> 
+              <span class="text-sky-700 text-xs">"license"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"ISC",</span> 
+              <span class="text-sky-700 text-xs">"dependencies"<span class="text-red-500 text-xs">:</span></span> <span class="text-white text-sm">&#123;</span> 
+              <span class="text-sky-700 text-xs">"cors"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"^2.8.5",</span> 
+              <span class="text-sky-700 text-xs">"express"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"^4.19.2",</span> 
+              <span class="text-sky-700 text-xs">"nodemon"<span class="text-red-500 text-xs">:</span></span>  <span class="text-green-500 text-xs">"^3.1.0",</span> 
+               <span class="text-black text-sm">&#125;</span>
+              <span class="text-black text-sm">&#125;</span> 
+          </code>
+          </pre>
+        </div>
       </div>
     </div>
 
@@ -358,16 +416,19 @@ Chart.register(...registerables);
       </p>
     </div>
 
-    <div class="relative p-4 border border-gray-100 rounded-lg">
-      <canvas class="w-auto sm:h-1/2" id="canvas">{{ chart }}</canvas>
-    </div>
-    <!-- <div class="relative">
-      <canvas class="w-[50px] h-[50px]" width="100px" height="100px" id="circle">{{chart}}</canvas>
-    </div> -->
+      <div class="w-full h-full flex  justify-center items-center  border border-gray-100 rounded-lg">
+        <canvas class="md:w-[50%] md:h-[50%]" *ngIf="isBrowser"  #pieComponent>{{chart}}</canvas>
+      </div>
+
+      <div class="w-full h-full lg:mt-[25%] flex justify-center items-center border border-gray-100 rounded lg:rounded-lg">
+        <canvas class="md:w-[100%] md:h-full"  *ngIf="isBrowser" #barComponent>{{ chart }}</canvas>
+      </div>
+      
+
 
     <div class="flex justify-center items-center mt-20 mb-20">
       <button
-        class="text-white font-normal rounded-lg bg-[#e38a00] text-[10px] px-3 py-1"
+        class="text-white sm:text-sm md:text-md font-normal rounded-lg bg-[#e38a00] text-[10px] px-4 py-2"
       >
         Explore Our Data
       </button>
@@ -760,16 +821,101 @@ Chart.register(...registerables);
           </li>
         </ul>
 
-        <button class="w-full px-4 py-2 text-white font-semibold rounded-xl border border-0 bg-orange-500 mt-5 transition-transform duration-500 transform hover:scale-110">Contact Us</button>
+        <button (click)="openModal()" class="w-full px-4 py-2 text-white font-semibold rounded-xl border border-0 bg-orange-500 mt-5 transition-transform duration-500 transform hover:scale-110">Contact Us</button>
       </div>
 
-      <div class="flex p-6 gap-3 items-center mt-12 border border-[#e38a00] rounded-xl bg-[#fff9ed]">
+
+        <!-- modal background  -->
+  <div [ngClass]="{'hidden': !isModalVisible}" class="bg-gray-700 fixed top-0 left-0 w-full h-full px-5 py-24 md:py-20 md:px-5 lg:px-[350px] bg-opacity-50 flex items-center justify-center">
+    <!-- modal content  -->
+    <div class="bg-white pb-6 pl-6 pr-6 pt-2 rounded-xl w-full h-auto">
+      <div class="flex justify-between mt-2">
+        <div></div>
+        <button  (click)="closeModal()" >
+        <svg fill="#000000" height="10px" width="10px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 492 492" xml:space="preserve">
+<g>
+	<g>
+		<path d="M300.188,246L484.14,62.04c5.06-5.064,7.852-11.82,7.86-19.024c0-7.208-2.792-13.972-7.86-19.028L468.02,7.872
+			c-5.068-5.076-11.824-7.856-19.036-7.856c-7.2,0-13.956,2.78-19.024,7.856L246.008,191.82L62.048,7.872
+			c-5.06-5.076-11.82-7.856-19.028-7.856c-7.2,0-13.96,2.78-19.02,7.856L7.872,23.988c-10.496,10.496-10.496,27.568,0,38.052
+			L191.828,246L7.872,429.952c-5.064,5.072-7.852,11.828-7.852,19.032c0,7.204,2.788,13.96,7.852,19.028l16.124,16.116
+			c5.06,5.072,11.824,7.856,19.02,7.856c7.208,0,13.968-2.784,19.028-7.856l183.96-183.952l183.952,183.952
+			c5.068,5.072,11.824,7.856,19.024,7.856h0.008c7.204,0,13.96-2.784,19.028-7.856l16.12-16.116
+			c5.06-5.064,7.852-11.824,7.852-19.028c0-7.204-2.792-13.96-7.852-19.028L300.188,246z"/>
+	</g>
+</g>
+        </svg>
+      </button>
+      </div>
+      <div class="mx-auto">
+        <div class="text-center">
+        <h2 class="text-black text-lg font-semibold sm:text-xl md:text-2xl">Contact Us</h2>
+        <p class="text-gray-500 text-xs pb-5">We'd love to make a part of ours. Please fill out this form.</p>
+      </div>
+
+      <form class="grid grid-col-1 pt-15 sm:grid-cols-8 gap-4">
+        <div class="sm:col-start-2 grid-col-4 sm:col-span-3">
+          <label for="first-name">First Name</label>
+          <input class="rounded-xl border border-gray-400 w-full" type="text" name="firstName" id="" placeholder="First Name">
+        </div>
+        <div class="grid-col-3 sm:col-span-3">
+          <label for="last-name">Last Name</label>
+          <input class="rounded-xl border border-gray-400 w-full" type="text" name="lastName" id="" placeholder="Last Name">
+        </div>
+        <div class="sm:col-start-2 sm:col-span-6">
+          <label for="email">Email</label>
+          <input class="rounded-xl w-full border border-gray-400" type="email" name="email" id="" placeholder="you@company.com">
+        </div>
+        <div class="sm:col-start-2 sm:col-span-6">
+          <label for="phone-number">Phone Number</label>
+          <div class="relative flex items-center cursor-pointer">
+            <span class="absolute px-2 flex justify-center items-center text-gray-500">
+              <p>US </p>
+            <svg class="ml-1" fill="#000000" height="7px" width="7px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+            viewBox="0 0 330 330" xml:space="preserve">
+          <path id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393
+            c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393
+            s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
+          </svg>
+            </span>
+            <input class="rounded-xl w-full border border-gray-400 pt-2 pb-2 pr-2 pl-14" type="phone" name="phone" id="" placeholder="+1 (555) 000-0000">
+          </div>
+        </div>
+
+        <div class="sm:col-start-2 sm:col-span-6">
+        <div class="flex w-full">
+          <input type="checkbox" name="agree" id="">
+          <p class="ml-4 text-sm text-gray-500">You agree to our friendly <a href="#">privacy policy.</a></p>
+        </div>
+        </div>
+        
+        <div class="sm:col-start-2 sm:col-span-6">
+          <button class="w-full bg-orange-500 rounded-xl px-4 py-2 text-white font-bold transition-transform duration-500 hover:scale-110" type="submit">Send Message</button>
+        </div>
+          
+      </form>
+      
+      </div>
+    </div>
+  </div>
+
+      <div class="flex flex-col sm:flex-row p-6 gap-3 items-center mt-12 mx-6 border border-[#e38a00] rounded-xl bg-[#fff9ed]">
       <div class="p-4 bg-white rounded-xl border border-[#e38a00]"> <ng-icon color="orange" size="25" name="heroExclamationTriangle"></ng-icon> </div>
-      <p class="p-4 text-xs text-gray-500"><strong class="text-black">We do not offer any refunds</strong> after Subscribing and creating an API key! You can fully test and explore our API in a <br>
-         rate-limited fshion before signing up. All our endpoints are public - see our <a  class="text-black" href="#">API docs. FAQs,</a> and <a class="text-black" href="#">DB stats</a> for more. <br>
+      <p class="p-4 text-xs text-gray-500 "><strong class="text-black">We do not offer any refunds</strong> after Subscribing and creating an API key! You can fully test and explore our API in a <br>
+         rate-limited fashion before signing up. All our endpoints are public - see our <a  class="text-black" href="#">API docs. FAQs,</a> and <a class="text-black" href="#">DB stats</a> for more. <br>
       Due to our small team size and beta status, we can only provide limited support at this time. 
       </p>
       </div>
+
+      
+      <div class="flex justify-center"> 
+          <button
+              class="text-white px-6 py-2 mt-8 text-xs sm:text-xs md:text-sm font-semibold rounded-xl bg-[#e38a00]"
+            >
+            <a [routerLink]="['/pricing']"> Check Our Pricing</a> 
+            </button>
+          </div>
 
       <div class="flex flex-col justify-center items-center mt-20 mb-15">
       <h1 class="text-xl sm:text-xl md:text-2xl text-black font-bold my-4">
@@ -777,34 +923,58 @@ Chart.register(...registerables);
       </h1>
     </div>
 
-    <div class="p-4 flex mt-4 justify-between items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
+    <div class="max-w-sm sm:max-w-md p-2 mx-auto">
+      <div class="p-4 flex mt-4 justify-between gap-4 items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
       <p class="text-gray-500 text-left">What is Joby.ai</p>
-      <ng-icon name="heroPlus"></ng-icon>
+     <ng-icon class="pr-4" *ngIf="!plusone" (click)="togglePlusone()" name="heroPlus" ></ng-icon> 
+     <ng-icon class="pr-4" *ngIf="plusone" (click)="togglePlusone()" name="heroXMark"></ng-icon>
     </div>
-
-    <div class="p-4 flex mt-4 justify-between items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
-      <p class="text-gray-500 text-left">What kind of market data and inteligence does your site provide?</p>
-      <ng-icon name="heroPlus"></ng-icon>
-    </div>
-
-    <div class="p-4 flex mt-4 justify-between items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
-      <p class="text-gray-500 text-left">Is the market data and inteligence provided on your site reliable?</p>
-      <ng-icon name="heroPlus"></ng-icon>
-    </div>
-
-    <div class="p-4 flex mt-4 justify-between items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
-      <div>
-      <p class="text-gray-500 text-ss text-left">Can users customize their market data and inteligence preferences?</p>
-      <p  class="text-gray-500 text-xs text-left">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
+    <p [ngClass]="{'hidden': !plusone }" class="text-gray-500 text-xs text-left">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
         of data they want to receive (e.g. financial metrics, news updates, consumer trends), and the frequency of updates they prefer (e.g. daily, weekly, monthly). this customization helps users tailor their information intake to align with their strategic goals and decision making processes. </p>
     </div>
-      <ng-icon name="heroXMark"></ng-icon>
+
+
+    <div class="max-w-sm sm:max-w-md p-2 mx-auto">
+      <div class="p-4 flex mt-4 justify-between gap-4 items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
+      <p class="text-gray-500 text-left">What kind of market data and inteligence does your site provide?</p>
+      <ng-icon class="pr-4" *ngIf="!plustwo" (click)="togglePlustwo()" name="heroPlus"></ng-icon>
+      <ng-icon class="pr-4" *ngIf="plustwo" (click)="togglePlustwo()" name="heroXMark"></ng-icon>
+    </div>
+    <p [ngClass]="{'hidden': !plustwo}" class="text-gray-500 text-xs text-left hidden">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
+        of data they want to receive (e.g. financial metrics, news updates, consumer trends), and the frequency of updates they prefer (e.g. daily, weekly, monthly). this customization helps users tailor their information intake to align with their strategic goals and decision making processes. </p>
     </div>
 
-    <div class="p-4 flex mt-4 justify-between items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
-      <p class="text-gray-500 text-left">Do you offer real-time updates on market trends and job oppotunities?</p>
-      <ng-icon name="heroPlus"></ng-icon>
+    <div class="max-w-sm sm:max-w-md p-2 mx-auto">
+      <div class="p-4 flex mt-4 justify-between gap-4 items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
+      <p class="text-gray-500 text-left">Is the market data and inteligence provided on your site reliable?</p>
+      <ng-icon class="pr-4" *ngIf="!plusthree" (click)="togglePlusthree()" name="heroPlus"></ng-icon>
+      <ng-icon class="pr-4" *ngIf="plusthree" (click)="togglePlusthree()" name="heroXMark"></ng-icon>    
     </div>
+    <p [ngClass]="{'hidden': !plusthree}" class="text-gray-500 text-xs text-left">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
+        of data they want to receive (e.g. financial metrics, news updates, consumer trends), and the frequency of updates they prefer (e.g. daily, weekly, monthly). this customization helps users tailor their information intake to align with their strategic goals and decision making processes. </p>
+    </div>
+
+    <div class="max-w-sm sm:max-w-md p-2 mx-auto">
+      <div class="p-4 flex mt-4 justify-between gap-4 items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
+      <p class="text-gray-500 text-left">Can users customize their market data and inteligence preferences?</p>
+      <ng-icon class="pr-4" *ngIf="!plusfour" (click)="togglePlusfour()" name="heroPlus"></ng-icon>
+      <ng-icon class="pr-4" *ngIf="plusfour" (click)="togglePlusfour()" name="heroXMark"></ng-icon>  
+    </div>
+    <p [ngClass]="{'hidden': !plusfour}" class="text-gray-500 text-xs text-left">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
+        of data they want to receive (e.g. financial metrics, news updates, consumer trends), and the frequency of updates they prefer (e.g. daily, weekly, monthly). this customization helps users tailor their information intake to align with their strategic goals and decision making processes. </p>
+    </div>
+
+
+    <div class="max-w-sm sm:max-w-md p-2 mx-auto">
+      <div class="p-4 flex mt-4 justify-between gap-4 items-center max-w-md mx-auto bg-[#f9f9f9] rounded-xl">
+      <p class="text-gray-500 text-left">Do you offer real-time updates on market trends and job oppotunities?</p>
+      <ng-icon class="pr-4" *ngIf="!plusfive" (click)="togglePlusfive()" name="heroPlus"></ng-icon>
+      <ng-icon class="pr-4" *ngIf="plusfive" (click)="togglePlusfive()" name="heroXMark"></ng-icon> 
+    </div>
+    <p [ngClass]="{'hidden': !plusfive}" class="text-gray-500 text-xs text-left">Certainly! users typically have the ability to customize their market data and inteligence preferences based on factors such as the specific industries they are interested in, the type
+        of data they want to receive (e.g. financial metrics, news updates, consumer trends), and the frequency of updates they prefer (e.g. daily, weekly, monthly). this customization helps users tailor their information intake to align with their strategic goals and decision making processes. </p>
+    </div>
+
 
     <div class="flex flex-col justify-center items-center mt-14">
       <h1 class="text-xl text-center sm:text-2xl md:3xl text-black font-bold">
@@ -817,7 +987,7 @@ Chart.register(...registerables);
       <button
               class="text-white px-4 py-2 mt-8 text-xs sm:text-xs md:text-sm font-semibold rounded-xl bg-[#e38a00]"
             >
-              <a href="#">Book a demo</a>
+              Book a demo
             </button>
     </div>
 
@@ -867,19 +1037,22 @@ Chart.register(...registerables);
             class="text-black font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl"
           >
             Ready to access real-time jobs quicker than others?
-            >
           </h1>
         
           <div class="flex items-center justify-center mt-6">
             <button
-              class="text-white px-4 py-2 text-xs sm:text-sm md:text-md font-semibold rounded-xl bg-[#e38a00]"
+            (click)="activateGetApi()"
+            [ngClass]="{'bg-[#e38a00]': isgetApi, 'rounded-xl': isgetApi, 'text-white': isgetApi}"
+              class="text-black px-4 py-2 text-xs sm:text-sm md:text-md font-semibold"
             >
-              <a href="#">Download API key</a>
+              Download API key
             </button>
             <button
-              class="text-black text-xs sm:text-sm md:text-md font-semibold ml-5"
+            (click)="activateGetForFree()"
+            [ngClass]="{'bg-[#e38a00]': isgetForFree, 'rounded-xl': isgetForFree, 'text-white': isgetForFree}"
+              class="text-black px-4 py-2 text-xs sm:text-sm md:text-md font-semibold ml-5"
             >
-              <a href="#">Try for free</a>
+             Try for free
             </button>
           </div>
         </div>
@@ -1024,10 +1197,126 @@ Chart.register(...registerables);
   `,
   styleUrl: './main.component.css',
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements AfterViewInit {
+  @ViewChild('barComponent') barComponent!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('pieComponent') pieComponent!: ElementRef<HTMLCanvasElement>;
+
+  isJobSeekers: boolean = true;
+  isEmployer: boolean = false;
+  isData: boolean = false;
+  isLogin: boolean = false;
+  isMobileLogin: boolean = false;
+  isSignin: boolean = true;
+  isMobileSignin: boolean = false;
+  isGetAccess: boolean = true;
+  isExploreData: boolean = false;
+  isgetApi: boolean = true;
+  isgetForFree: boolean = false;
+  plusone: boolean = false;
+  plustwo: boolean = false;
+  plusthree: boolean = false;
+  plusfour: boolean = false;
+  plusfive: boolean = false;
+  isjson: boolean = true;
+  isdictionary: boolean = false;
+
+  toggleJson(){
+    this.isjson = true;
+    this.isdictionary = false;
+  }
+
+  toggleDictionary(){
+    this.isjson = false;
+    this.isdictionary = true;
+  }
+
+  togglePlusone(){
+    this.plusone = !this.plusone
+  }
+
+  togglePlustwo(){
+    this.plustwo = !this.plustwo
+  }
+
+  togglePlusthree(){
+    this.plusthree = !this.plusthree
+  }
+
+  togglePlusfour(){
+    this.plusfour = !this.plusfour
+  }
+
+  togglePlusfive(){
+    this.plusfive = !this.plusfive
+  }
+
+
+  
   hideBar: boolean = false;
   chart: any = [];
   pie: any = [];
+
+  activateNavJobSeeker(){
+    this.isJobSeekers = true
+    this.isEmployer = false
+    this.isData = false
+    this.isMobileLogin = false
+    this.isMobileSignin = false
+  }
+  activateNavEmployer(){
+    this.isEmployer = true
+    this.isJobSeekers = false
+    this.isData = false
+    this.isMobileLogin = false
+    this.isMobileSignin = false
+  }
+  activateNavData(){
+    this.isData = true
+    this.isEmployer = false
+    this.isJobSeekers = false
+    this.isMobileLogin = false
+    this.isMobileSignin = false
+  }
+  activateMobileLogin(){
+    this.isData = false
+    this.isEmployer = false
+    this.isJobSeekers = false
+    this.isMobileSignin = false;
+    this.isMobileLogin = true
+  }
+  activateMobileSignin(){
+    this.isData = false
+    this.isEmployer = false
+    this.isJobSeekers = false
+    this.isMobileLogin = false;
+    this.isMobileSignin = true;
+  }
+
+  activateSignin(){
+    this.isSignin = true;
+    this.isLogin = false;
+  }
+
+  activateLogin(){
+    this.isLogin = true;
+    this.isSignin = false;
+  }
+  activateGetAccess(){
+    this.isGetAccess = true;
+    this.isExploreData = false;
+  }
+  activateExploreData(){
+    this.isGetAccess = false;
+    this.isExploreData = true;
+  }
+  activateGetApi(){
+    this.isgetApi = true;
+    this.isgetForFree = false;
+  }
+  activateGetForFree(){
+    this.isgetApi = false;
+    this.isgetForFree = true;
+  }
 
   toggleNav() {
     this.hideBar = !this.hideBar;
@@ -1035,33 +1324,27 @@ export class MainComponent implements OnInit {
 
   totalUsers: any;
 
-  // createTotalUsersChart(): any {
-  //   return {
-  //     type: 'line',
-  //     data: {
-  //       labels: ['Jan', 'Feb', 'Mar', "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-  //       datasets: [
-  //         {
-  //           labels: 'Total Users',
-  //           data: [12, 24, 41, 19, 17, 33, 28, 39, 15, 9, 21, 30],
-  //           borderWidth: 1,
-  //         },
-  //       ],
-  //     },
-  //     options: {
-  //       scales: {
-  //         y: {
-  //           beginAtZero: true,
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+  public isBrowser: boolean;
 
-  constructor() {}
+  isModalVisible: boolean = false;
 
-  ngOnInit(): void {
-    this.chart = new Chart('canvas', {
+  openModal(): void{
+    this.isModalVisible = true;
+  };
+
+  closeModal(): void{
+    this.isModalVisible = false;
+  }
+
+  constructor(@Inject(PLATFORM_ID) platformId: Object, private renderer2: Renderer2) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+ 
+
+  ngAfterViewInit(): void {
+    
+    
+    this.chart = new Chart(this.barComponent.nativeElement, {
       type: 'bar',
       data: {
         labels: [
@@ -1080,7 +1363,7 @@ export class MainComponent implements OnInit {
           {
             label: 'cities',
             data: [
-              5.0, 1.5, 2.4, 3.3, 2.3, 3.9, 3.5, 1.4, 4.1, 2.5, 4.1, 3.2, 2.0,
+              152, 37, 77, 53, 81, 80, 146, 89, 41, 99, 57, 32, 180,
             ],
             backgroundColor: [
               '#4e57f0',
@@ -1129,11 +1412,12 @@ export class MainComponent implements OnInit {
             text: 'Job Posting bar chart',
           },
         },
-        responsive: true,
+        responsive: false,
       },
     });
 
-    this.pie = new Chart('circle', {
+   
+    this.pie = new Chart(this.pieComponent.nativeElement, {
       type: 'pie',
       data: {
         labels: [
@@ -1195,7 +1479,10 @@ export class MainComponent implements OnInit {
             beginAtZero: true,
           },
         },
+        responsive: false,
       },
     });
+
   }
+
 }

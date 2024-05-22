@@ -72,8 +72,9 @@ import { RouterLink } from '@angular/router';
       <button class="text-purple-600 mt-2 text-bold border border-purple-500 rounded-full px-4 py-1 text-sm hover:text-white hover:bg-purple-600 hover:border-transparent focus:ring-2">Message</button>
     </div>
   </div>
-
-  <div class="max-w-sm bg-white mx-auto mt-2 rounded-xl">
+  
+<div class="bg-gray-800">
+  <div class="max-w-sm bg-white mx-auto mt-2 rounded-xl p-4">
     <ul class="p-4 divide-y divide-slate-300">
       <li class="flex p-4">
         <img class="w-14 h-14 rounded-full" src="/assets/images/images-73.jpeg" alt="">
@@ -101,6 +102,7 @@ import { RouterLink } from '@angular/router';
     
     </ul>
   </div>
+</div>
 
   <div class="mx-auto bg-white w-full sm:max-w-sm sm:w-sm md:w-sm rounded-xl mt-2 p-6">
   <fieldset>
@@ -119,8 +121,8 @@ import { RouterLink } from '@angular/router';
 
 </div>
 
-<div class="bg-gray-800 p-4 flex gap-2">
-  <form class="flex items-center space-x-6 bg-white max-w-sm">
+<div class="bg-gray-800 p-4 flex flex-col sm:flex-row gap-2">
+  <form class="flex items-center p-8 sm:p-0 space-x-6 bg-white max-w-sm">
     <div class="shrink-0">
       <img class="w-14 h-14 rounded-full object-cover" src="/assets/images/profile2.jpeg" alt="">
     </div>
@@ -152,7 +154,7 @@ import { RouterLink } from '@angular/router';
   <p class="font-bold text-sm sm:text-md md:text-lg lg:text-3xl text-white">word of the wise</p>
 </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-6 bg-blue-800 gap-2">
+  <div class="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-6 bg-blue-800 gap-2 p-4">
     <div class="bg-white sm:col-span-1 h-full w-full rounded-xl p-6">
       <p>we are the first div</p>
       <p>we are the first div</p>

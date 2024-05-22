@@ -40,14 +40,6 @@ import { RouterLink } from '@angular/router';
               <img class="w-3 h-3 rounded-full" src="assets/images/check-icon.jpg" alt="">
               <p class="pl-2">Standard API documentation and <br> limited support</p>
             </div>
-            <div class="flex items-center">
-              <div class="w-3 h-3 rounded-full" > </div>
-              <p class="pl-2"></p>
-            </div>
-            <div class="flex items-center">
-              <div class="w-3 h-3 rounded-full" > </div>
-              <p class="pl-2"></p>
-            </div>
           </li>
         </ul>
 
