@@ -420,7 +420,7 @@ Chart.register(...registerables);
         <canvas class="md:w-[50%] md:h-[50%]" *ngIf="isBrowser"  #pieComponent>{{chart}}</canvas>
       </div>
 
-      <div class="w-full h-full lg:mt-[25%] flex justify-center items-center border border-gray-100 rounded lg:rounded-lg">
+      <div class="w-full h-full lg:mt-[5%] flex justify-center items-center border border-gray-100 rounded lg:rounded-lg">
         <canvas class="md:w-[100%] md:h-full"  *ngIf="isBrowser" #barComponent>{{ chart }}</canvas>
       </div>
       
@@ -1198,8 +1198,8 @@ Chart.register(...registerables);
   styleUrl: './main.component.css',
 })
 export class MainComponent implements AfterViewInit {
-  @ViewChild('barComponent') barComponent!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('pieComponent') pieComponent!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('barComponent', { static: false }) barComponent!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('pieComponent', { static: false }) pieComponent!: ElementRef<HTMLCanvasElement>;
 
   isJobSeekers: boolean = true;
   isEmployer: boolean = false;
@@ -1342,147 +1342,152 @@ export class MainComponent implements AfterViewInit {
  
 
   ngAfterViewInit(): void {
+    if(this.barComponent && !this.barComponent.nativeElement) return;
+    if(this.pieComponent && !this.pieComponent.nativeElement) return;
     
-    
-    this.chart = new Chart(this.barComponent.nativeElement, {
-      type: 'bar',
-      data: {
-        labels: [
-          'United States',
-          'China',
-          'India',
-          'Russia',
-          'Japan',
-          'Germany',
-          'Italy',
-          'United Kingdom',
-          'France',
-          'Denmark',
-        ],
-        datasets: [
-          {
-            label: 'cities',
-            data: [
-              152, 37, 77, 53, 81, 80, 146, 89, 41, 99, 57, 32, 180,
-            ],
-            backgroundColor: [
-              '#4e57f0',
-              '#dd1949',
-              '#a9bbfd',
-              '#f49d4d',
-              '#99a2b3',
-              '#f8ca7d',
-              '#f9e9ae',
-              '#302fcb',
-              '#bb3131',
-              '#159c7c',
-              '#0d8468',
-              '#591898',
-              '#b8b7b3',
-            ],
-            borderRadius: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-            borderColor: [
-              '#4e57f0',
-              '#dd1949',
-              '#a9bbfd',
-              '#f49d4d',
-              '#99a2b3',
-              '#f8ca7d',
-              '#f9e9ae',
-              '#302fcb',
-              '#bb3131',
-              '#159c7c',
-              '#0d8468',
-              '#591898',
-              '#b8b7b3',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
+    console.log('i am okay')
+    if(this.barComponent && this.barComponent.nativeElement && this.pieComponent && this.pieComponent.nativeElement){
+      this.chart = new Chart(this.barComponent && this.barComponent.nativeElement, {
+        type: 'bar',
+        data: {
+          labels: [
+            'United States',
+            'China',
+            'India',
+            'Russia',
+            'Japan',
+            'Germany',
+            'Italy',
+            'United Kingdom',
+            'France',
+            'Denmark',
+          ],
+          datasets: [
+            {
+              label: 'cities',
+              data: [
+                152, 37, 77, 53, 81, 80, 146, 89, 41, 99, 57, 32, 180,
+              ],
+              backgroundColor: [
+                '#4e57f0',
+                '#dd1949',
+                '#a9bbfd',
+                '#f49d4d',
+                '#99a2b3',
+                '#f8ca7d',
+                '#f9e9ae',
+                '#302fcb',
+                '#bb3131',
+                '#159c7c',
+                '#0d8468',
+                '#591898',
+                '#b8b7b3',
+              ],
+              borderRadius: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+              borderColor: [
+                '#4e57f0',
+                '#dd1949',
+                '#a9bbfd',
+                '#f49d4d',
+                '#99a2b3',
+                '#f8ca7d',
+                '#f9e9ae',
+                '#302fcb',
+                '#bb3131',
+                '#159c7c',
+                '#0d8468',
+                '#591898',
+                '#b8b7b3',
+              ],
+              borderWidth: 1,
+            },
+          ],
         },
-        plugins: {
-          subtitle: {
-            display: true,
-            text: 'Job Posting bar chart',
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
           },
+          plugins: {
+            subtitle: {
+              display: true,
+              text: 'Job Posting bar chart',
+            },
+          },
+          responsive: false,
         },
-        responsive: false,
-      },
-    });
-
+      });
+  
+     
+      this.pie = new Chart(this.pieComponent && this.pieComponent.nativeElement, {
+        type: 'pie',
+        data: {
+          labels: [
+            'United States',
+            'China',
+            'India',
+            'Russia',
+            'Japan',
+            'Germany',
+            'Italy',
+            'United Kingdom',
+            'France',
+            'Denmark',
+          ],
+          datasets: [
+            {
+              label: 'cities',
+              data: [
+                5.0, 1.5, 2.4, 3.3, 2.3, 3.9, 3.5, 1.4, 4.1, 2.5, 4.1, 3.2, 2.0,
+              ],
+              backgroundColor: [
+                '#4e57f0',
+                '#dd1949',
+                '#a9bbfd',
+                '#f49d4d',
+                '#99a2b3',
+                '#f8ca7d',
+                '#f9e9ae',
+                '#302fcb',
+                '#bb3131',
+                '#159c7c',
+                '#0d8468',
+                '#591898',
+                '#b8b7b3',
+              ],
+              borderRadius: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+              borderColor: [
+                '#4e57f0',
+                '#dd1949',
+                '#a9bbfd',
+                '#f49d4d',
+                '#99a2b3',
+                '#f8ca7d',
+                '#f9e9ae',
+                '#302fcb',
+                '#bb3131',
+                '#159c7c',
+                '#0d8468',
+                '#591898',
+                '#b8b7b3',
+              ],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+          responsive: false,
+        },
+      });
+  
+    }
    
-    this.pie = new Chart(this.pieComponent.nativeElement, {
-      type: 'pie',
-      data: {
-        labels: [
-          'United States',
-          'China',
-          'India',
-          'Russia',
-          'Japan',
-          'Germany',
-          'Italy',
-          'United Kingdom',
-          'France',
-          'Denmark',
-        ],
-        datasets: [
-          {
-            label: 'cities',
-            data: [
-              5.0, 1.5, 2.4, 3.3, 2.3, 3.9, 3.5, 1.4, 4.1, 2.5, 4.1, 3.2, 2.0,
-            ],
-            backgroundColor: [
-              '#4e57f0',
-              '#dd1949',
-              '#a9bbfd',
-              '#f49d4d',
-              '#99a2b3',
-              '#f8ca7d',
-              '#f9e9ae',
-              '#302fcb',
-              '#bb3131',
-              '#159c7c',
-              '#0d8468',
-              '#591898',
-              '#b8b7b3',
-            ],
-            borderRadius: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-            borderColor: [
-              '#4e57f0',
-              '#dd1949',
-              '#a9bbfd',
-              '#f49d4d',
-              '#99a2b3',
-              '#f8ca7d',
-              '#f9e9ae',
-              '#302fcb',
-              '#bb3131',
-              '#159c7c',
-              '#0d8468',
-              '#591898',
-              '#b8b7b3',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-        responsive: false,
-      },
-    });
-
   }
 
 }
